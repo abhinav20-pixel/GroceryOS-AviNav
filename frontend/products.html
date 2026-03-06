@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroceryOS | Products - AviNav</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        glass: 'rgba(255, 255, 255, 0.7)',
+                        darkGlass: 'rgba(30, 41, 59, 0.7)'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body
+    class="bg-gray-50 text-gray-800 transition-colors duration-300 dark:bg-slate-900 dark:text-gray-100 min-h-screen flex overflow-hidden">
+
+    <!-- Sidebar (Same as Dashboard) -->
+    <aside class="w-64 glass-panel border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen fixed z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                <i class="fas fa-shopping-basket text-xl"></i>
+            </div>
+            <h1
+                class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                GroceryOS</h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li><a href="dashboard.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-chart-pie w-5"></i> Dashboard</a></li>
+                <li><a href="products.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-box w-5"></i> Products</a></li>
+                <li><a href="orders.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-shopping-cart w-5"></i> Orders</a></li>
+                <li><a href="customers.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-users w-5"></i> Customers</a></li>
+                <li><a href="invoices.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-file-invoice-dollar w-5"></i> Invoices</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 h-screen overflow-y-auto">
+        <!-- Header -->
+        <header
+            class="h-16 glass-panel sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8">
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Search products..."
+                    class="pl-10 pr-4 py-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm">
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="theme-toggle"
+                    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 transition-colors"></button>
+            </div>
+        </header>
+
+        <!-- Products Content -->
+        <div class="p-8">
+            <div class="mb-8 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-bold mb-1">Products Inventory</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Manage your store catalog and stock points.</p>
+                </div>
+                <button onclick="openModal()"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all font-medium flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Add Product
+                </button>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Products dynamically inserted here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-2xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0 duration-300"
+            id="modalContent">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold" id="modalTitle">Add New Product</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="productForm" class="space-y-4">
+                <input type="hidden" id="productId">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Product Name</label>
+                    <input type="text" id="pName" required
+                        class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Category</label>
+                        <select id="pCategory" required
+                            class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="Produce">Produce</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Meat">Meat</option>
+                            <option value="Bakery">Bakery</option>
+                            <option value="Pantry">Pantry</option>
+                            <option value="Beverages">Beverages</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Price ($)</label>
+                        <input type="number" id="pPrice" step="0.01" required
+                            class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Quantity</label>
+                        <input type="number" id="pQuantity" required
+                            class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Supplier</label>
+                        <input type="text" id="pSupplier"
+                            class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Image URL</label>
+                    <input type="url" id="pImage" placeholder="https://..."
+                        class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="mt-6 flex gap-3">
+                    <button type="button" onclick="closeModal()"
+                        class="flex-1 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-indigo-500/30 transition-all font-medium">Save
+                        Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let allProducts = [];
+
+        async function fetchProducts(search = '') {
+            try {
+                let url = '/products';
+                if (search) url += `?search=${encodeURIComponent(search)}`;
+                allProducts = await fetchAPI(url);
+                renderProducts();
+            } catch (error) {
+                console.error("Failed to fetch products", error);
+            }
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            if (allProducts.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500"><i class="fas fa-box-open text-4xl mb-4"></i><p>No products found.</p></div>`;
+                return;
+            }
+
+            allProducts.forEach(product => {
+                const stockColor = product.quantity < 10 ? 'text-red-500' : 'text-green-500';
+                const defaultImage = `https://ui-avatars.com/api/?name=${product.name.substring(0, 2)}&background=random&color=fff&size=200`;
+                const imageUrl = product.image_url || defaultImage;
+
+                const card = document.createElement('div');
+                card.className = "glass-panel rounded-2xl overflow-hidden hover-scale flex flex-col group relative";
+                card.innerHTML = `
+                    <div class="h-48 overflow-hidden bg-gray-200 dark:bg-gray-800">
+                        <img src="${imageUrl}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.src='${defaultImage}'">
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-semibold px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">${product.category}</span>
+                            <span class="font-bold text-lg">$${product.price.toFixed(2)}</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-1 line-clamp-1">${product.name}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-1">Supplier: ${product.supplier || 'N/A'}</p>
+                        
+                        <div class="mt-auto border-t border-gray-100 dark:border-gray-700 pt-4 flex justify-between items-center">
+                            <span class="text-sm font-medium ${stockColor}"><i class="fas fa-cubes pb-1"></i> ${product.quantity} in stock</span>
+                            <div class="flex gap-2">
+                                <button onclick="editProduct(${product.id})" class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 transition-colors"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteProduct(${product.id})" class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 transition-colors"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Search Input delay
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchProducts(e.target.value);
+            }, 300);
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('productModal');
+        const modalContent = document.getElementById('modalContent');
+
+        function openModal(id = null) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('modalTitle').innerText = 'Add New Product';
+        }
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function editProduct(id) {
+            const product = allProducts.find(p => p.id === id);
+            if (!product) return;
+
+            document.getElementById('productId').value = product.id;
+            document.getElementById('pName').value = product.name;
+            document.getElementById('pCategory').value = product.category;
+            document.getElementById('pPrice').value = product.price;
+            document.getElementById('pQuantity').value = product.quantity;
+            document.getElementById('pSupplier').value = product.supplier || '';
+            document.getElementById('pImage').value = product.image_url || '';
+
+            document.getElementById('modalTitle').innerText = 'Edit Product';
+
+            openModal();
+        }
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('productId').value;
+            const payload = {
+                name: document.getElementById('pName').value,
+                category: document.getElementById('pCategory').value,
+                price: parseFloat(document.getElementById('pPrice').value),
+                quantity: parseInt(document.getElementById('pQuantity').value),
+                supplier: document.getElementById('pSupplier').value,
+                image_url: document.getElementById('pImage').value
+            };
+
+            try {
+                if (id) {
+                    await fetchAPI(`/products/${id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(payload)
+                    });
+                    showNotification('Product updated successfuly!');
+                } else {
+                    await fetchAPI(`/products`, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    showNotification('Product added successfuly!');
+                }
+                closeModal();
+                fetchProducts();
+            } catch (error) {
+                // Handled in api.js
+            }
+        });
+
+        async function deleteProduct(id) {
+            if (confirm("Are you sure you want to delete this product?")) {
+                try {
+                    await fetchAPI(`/products/${id}`, { method: 'DELETE' });
+                    showNotification('Product deleted successfully');
+                    fetchProducts();
+                } catch (error) { }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProducts();
+        });
+    </script>
+</body>
+
+</html>

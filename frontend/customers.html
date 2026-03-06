@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroceryOS | Customers - AviNav</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        glass: 'rgba(255, 255, 255, 0.7)',
+                        darkGlass: 'rgba(30, 41, 59, 0.7)'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body
+    class="bg-gray-50 text-gray-800 transition-colors duration-300 dark:bg-slate-900 dark:text-gray-100 min-h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass-panel border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen fixed z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                <i class="fas fa-shopping-basket text-xl"></i>
+            </div>
+            <h1
+                class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                GroceryOS</h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li><a href="dashboard.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-chart-pie w-5"></i> Dashboard</a></li>
+                <li><a href="products.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-box w-5"></i> Products</a></li>
+                <li><a href="orders.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-shopping-cart w-5"></i> Orders</a></li>
+                <li><a href="customers.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-users w-5"></i> Customers</a></li>
+                <li><a href="invoices.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-file-invoice-dollar w-5"></i> Invoices</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 h-screen overflow-y-auto">
+        <!-- Header -->
+        <header
+            class="h-16 glass-panel sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8">
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Search customers..."
+                    class="pl-10 pr-4 py-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm">
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="theme-toggle"
+                    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 transition-colors"></button>
+            </div>
+        </header>
+
+        <!-- Customers Content -->
+        <div class="p-8">
+            <div class="mb-8 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-bold mb-1">Customer Directory</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Manage loyal customers and track their
+                        purchases.</p>
+                </div>
+                <button onclick="openModal()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all font-medium flex items-center gap-2">
+                    <i class="fas fa-user-plus"></i> Add Customer
+                </button>
+            </div>
+
+            <!-- Customers Table -->
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr
+                                class="border-b border-gray-200 dark:border-gray-700 text-sm uppercase text-gray-500 tracking-wider">
+                                <th class="p-4 rounded-tl-2xl">Customer Details</th>
+                                <th class="p-4">Contact Info</th>
+                                <th class="p-4">Address</th>
+                                <th class="p-4 text-right">Total Spent</th>
+                                <th class="p-4 text-center rounded-tr-2xl">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTable" class="text-sm">
+                            <!-- Customers populated here -->
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-gray-500"><i
+                                        class="fas fa-spinner fa-spin mr-2"></i> Loading customers...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Customer Modal -->
+    <div id="customerModal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-2xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0 duration-300"
+            id="modalContent">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold" id="modalTitle">Register Customer</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="customerForm" class="space-y-4">
+                <input type="hidden" id="customerId">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Full Name</label>
+                    <input type="text" id="cName" required
+                        class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Phone Number</label>
+                        <input type="text" id="cPhone"
+                            class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Email</label>
+                        <input type="email" id="cEmail"
+                            class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Address</label>
+                    <textarea id="cAddress" rows="2"
+                        class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button type="button" onclick="closeModal()"
+                        class="flex-1 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/30 transition-all font-medium">Save
+                        Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let allCustomers = [];
+
+        async function fetchCustomers() {
+            try {
+                allCustomers = await fetchAPI('/customers');
+                renderCustomers(allCustomers);
+            } catch (error) {
+                console.error("Failed to fetch customers", error);
+            }
+        }
+
+        function renderCustomers(data) {
+            const table = document.getElementById('customersTable');
+            table.innerHTML = '';
+
+            if (data.length === 0) {
+                table.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">No customers found.</td></tr>`;
+                return;
+            }
+
+            data.forEach(c => {
+                const initial = c.name.charAt(0).toUpperCase();
+                const totalSpent = c.total_purchases || 0;
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center font-bold text-lg">${initial}</div>
+                            <div>
+                                <p class="font-bold">${c.name}</p>
+                                <p class="text-xs text-gray-500">ID: #CUST-${c.id.toString().padStart(4, '0')}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <p><i class="fas fa-phone text-gray-400 w-4"></i> ${c.phone || 'N/A'}</p>
+                        <p class="text-gray-500 dark:text-gray-400"><i class="fas fa-envelope text-gray-400 w-4"></i> ${c.email || 'N/A'}</p>
+                    </td>
+                    <td class="p-4">
+                        <p class="truncate max-w-xs text-gray-500 dark:text-gray-400"><i class="fas fa-map-marker-alt text-gray-400 mr-1"></i> ${c.address || 'N/A'}</p>
+                    </td>
+                    <td class="p-4 text-right">
+                        <span class="font-bold text-indigo-600 dark:text-indigo-400">$${totalSpent.toFixed(2)}</span>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex justify-center gap-2">
+                            <button onclick="editCustomer(${c.id})" class="p-2 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors" title="Edit Customer"><i class="fas fa-edit"></i></button>
+                            <!-- Note: Real App would have View History / Delete here -->
+                        </div>
+                    </td>
+                `;
+                table.appendChild(tr);
+            });
+        }
+
+        // Search Filter
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allCustomers.filter(c =>
+                c.name.toLowerCase().includes(term) ||
+                (c.phone && c.phone.includes(term)) ||
+                (c.email && c.email.toLowerCase().includes(term))
+            );
+            renderCustomers(filtered);
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('customerModal');
+        const modalContent = document.getElementById('modalContent');
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.getElementById('customerForm').reset();
+            document.getElementById('customerId').value = '';
+            document.getElementById('modalTitle').innerText = 'Register Customer';
+        }
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function editCustomer(id) {
+            const customer = allCustomers.find(c => c.id === id);
+            if (!customer) return;
+
+            document.getElementById('customerId').value = customer.id;
+            document.getElementById('cName').value = customer.name;
+            document.getElementById('cPhone').value = customer.phone || '';
+            document.getElementById('cEmail').value = customer.email || '';
+            document.getElementById('cAddress').value = customer.address || '';
+
+            document.getElementById('modalTitle').innerText = 'Edit Customer';
+            openModal();
+        }
+
+        document.getElementById('customerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('cName').value,
+                phone: document.getElementById('cPhone').value || null,
+                email: document.getElementById('cEmail').value || null,
+                address: document.getElementById('cAddress').value || null
+            };
+
+            // Using POST since our simple backend only has create for customers so far
+            try {
+                await fetchAPI(`/customers`, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                showNotification('Customer registered successfully!');
+                closeModal();
+                fetchCustomers();
+            } catch (error) {
+                // Handled in api.js
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', fetchCustomers);
+    </script>
+</body>
+
+</html>

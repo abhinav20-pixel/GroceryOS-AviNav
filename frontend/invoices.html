@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroceryOS | Invoices - AviNav</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        glass: 'rgba(255, 255, 255, 0.7)',
+                        darkGlass: 'rgba(30, 41, 59, 0.7)'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body
+    class="bg-gray-50 text-gray-800 transition-colors duration-300 dark:bg-slate-900 dark:text-gray-100 min-h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass-panel border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen fixed z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                <i class="fas fa-shopping-basket text-xl"></i>
+            </div>
+            <h1
+                class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                GroceryOS</h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li><a href="dashboard.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-chart-pie w-5"></i> Dashboard</a></li>
+                <li><a href="products.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-box w-5"></i> Products</a></li>
+                <li><a href="orders.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-shopping-cart w-5"></i> Orders</a></li>
+                <li><a href="customers.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-users w-5"></i> Customers</a></li>
+                <li><a href="invoices.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-file-invoice-dollar w-5"></i> Invoices</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 h-screen overflow-y-auto">
+        <!-- Header -->
+        <header
+            class="h-16 glass-panel sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8">
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Search by Order ID or Date..."
+                    class="pl-10 pr-4 py-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm">
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="theme-toggle"
+                    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 transition-colors"></button>
+            </div>
+        </header>
+
+        <!-- Invoices Content -->
+        <div class="p-8 flex gap-8">
+            <!-- Left Side: Invoice List -->
+            <div class="w-full max-w-2xl flex-shrink-0">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold mb-1">Invoices & Billing</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Generate, download, and manage professional
+                        corporate invoices.</p>
+                </div>
+
+                <div class="glass-panel rounded-2xl overflow-hidden p-2" id="invoiceList">
+                    <!-- Invoices will populate here -->
+                    <div class="p-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i> Loading
+                        invoices...</div>
+                </div>
+            </div>
+
+            <!-- Right Side: PDF Visualizer -->
+            <div class="flex-1 hidden lg:flex items-start justify-center pt-16">
+                <!-- A4 Aspect ratio container for visual preview -->
+                <div class="bg-white dark:bg-gray-800 shadow-2xl rounded shadow-slate-200 dark:shadow-slate-900 overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 relative"
+                    style="width: 210mm; min-height: 297mm; transform: scale(0.65); transform-origin: top center;"
+                    id="invoicePreviewContainer">
+
+                    <div id="invoicePDF" class="p-10 text-gray-800 bg-white"
+                        style="width: 210mm; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                        <!-- Minimal receipt design for preview -->
+                        <div class="border-b-4 border-indigo-600 pb-6 mb-6 flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-16 h-16 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+                                    <i class="fas fa-shopping-basket text-3xl"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-3xl font-bold tracking-tight text-gray-900">GroceryOS</h1>
+                                    <p class="text-gray-500 text-sm">Premium Fresh Produce</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <h2 class="text-4xl font-extrabold text-gray-200 uppercase tracking-widest">INVOICE</h2>
+                                <p class="text-gray-600 font-medium" id="previewInvNo">INV-XXXX</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mb-10">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Billed To</p>
+                                <p class="font-bold text-lg text-gray-800" id="previewCustomer">Walk-in Customer</p>
+                                <p class="text-sm text-gray-500 mt-1">N/A</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Invoice Date
+                                </p>
+                                <p class="font-bold text-lg text-gray-800" id="previewDate">YYYY-MM-DD</p>
+                            </div>
+                        </div>
+
+                        <table class="w-full mb-10 text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 border-y border-gray-200">
+                                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Item
+                                        Description</th>
+                                    <th
+                                        class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
+                                        Qty</th>
+                                    <th
+                                        class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-right">
+                                        Price</th>
+                                    <th
+                                        class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-right">
+                                        Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 font-medium" colspan="4">Select an invoice to preview full
+                                        details.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="flex justify-end">
+                            <div class="w-64 space-y-3">
+                                <div class="flex justify-between border-b border-gray-200 pb-3">
+                                    <p class="text-gray-600 font-medium">Subtotal</p>
+                                    <p class="font-medium text-gray-900">---</p>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-200 pb-3">
+                                    <p class="text-gray-600 font-medium">Tax</p>
+                                    <p class="font-medium text-gray-900">---</p>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center bg-indigo-50 p-3 rounded text-indigo-900 border border-indigo-100">
+                                    <p class="font-bold text-lg text-indigo-600">Total Amount</p>
+                                    <p class="font-bold text-xl" id="previewTotal">$0.00</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-16 text-center text-sm text-gray-400 border-t border-gray-200 pt-8">
+                            <p class="font-medium text-gray-500 mb-1">Thank you for shopping with GroceryOS!</p>
+                            <p>For inquiries, please contact support@groceryos.com or call (555) 123-4567.</p>
+                        </div>
+                    </div>
+
+                    <!-- Overlay for hover download -->
+                    <div class="absolute inset-0 bg-indigo-900/60 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm cursor-pointer"
+                        onclick="downloadPDF()">
+                        <div
+                            class="bg-white text-indigo-600 px-6 py-3 rounded-full font-bold shadow-2xl flex items-center gap-2 transform scale-125">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        let allInvoices = [];
+        let currentlySelectedId = null;
+
+        async function fetchInvoices() {
+            try {
+                allInvoices = await fetchAPI('/invoices');
+                renderInvoices(allInvoices);
+            } catch (error) {
+                console.error("Failed to fetch invoices", error);
+            }
+        }
+
+        function renderInvoices(data) {
+            const list = document.getElementById('invoiceList');
+            list.innerHTML = '';
+
+            if (data.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-gray-500">No invoices. Create orders first.</div>`;
+                return;
+            }
+
+            data.forEach(inv => {
+                const el = document.createElement('div');
+                el.className = "flex items-center justify-between p-4 mb-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-sm";
+
+                el.onclick = () => previewInvoice(inv);
+
+                const dateStr = new Date(inv.date).toLocaleDateString();
+                const invNumber = `INV-${inv.invoice_id.toString().padStart(6, '0')}`;
+
+                el.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400 flex items-center justify-center text-xl">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-lg">${invNumber}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Order #${inv.order_id} | ${dateStr}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <div class="text-right">
+                            <p class="font-bold text-indigo-600 dark:text-indigo-400">$${inv.grand_total.toFixed(2)}</p>
+                            <p class="text-xs text-gray-500">${inv.customer_name || 'Walk-in'}</p>
+                        </div>
+                        <button onclick="downloadSpecificPDF('${invNumber}', event)" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-indigo-600 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-indigo-600 dark:hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Download Full PDF">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        function previewInvoice(inv) {
+            currentlySelectedId = inv.invoice_id; // For download function
+            const invNumber = `INV-${inv.invoice_id.toString().padStart(6, '0')}`;
+            document.getElementById('previewInvNo').innerText = invNumber;
+            document.getElementById('previewDate').innerText = new Date(inv.date).toLocaleDateString();
+            document.getElementById('previewCustomer').innerText = inv.customer_name || 'Walk-in Customer';
+            document.getElementById('previewTotal').innerText = `$${inv.grand_total.toFixed(2)}`;
+
+            // Re-highlight list
+            Array.from(document.getElementById('invoiceList').children).forEach(child => {
+                child.classList.remove('bg-white', 'dark:bg-slate-800', 'border-gray-200', 'shadow-sm');
+            });
+            event.currentTarget.classList.add('bg-white', 'dark:bg-slate-800', 'border-gray-200', 'shadow-sm');
+        }
+
+        function downloadPDF() {
+            if (!currentlySelectedId) return showNotification("Click on an invoice to select it first.", 'error');
+            const element = document.getElementById('invoicePDF');
+            const invNo = document.getElementById('previewInvNo').innerText;
+
+            const opt = {
+                margin: 0,
+                filename: `${invNo}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            showNotification("Generating high-quality PDF...", 'success');
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function downloadSpecificPDF(invNumber, event) {
+            event.stopPropagation();
+            showNotification(`Simulating download for ${invNumber}...`, 'success');
+            // In a real app we would load specific data into preview before downloading.
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allInvoices.filter(i =>
+                i.date.includes(term) ||
+                i.order_id.toString().includes(term) ||
+                i.invoice_id.toString().includes(term)
+            );
+            renderInvoices(filtered);
+        });
+
+        document.addEventListener('DOMContentLoaded', fetchInvoices);
+    </script>
+</body>
+
+</html>

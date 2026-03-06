@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroceryOS | Dashboard - AviNav</title>
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        glass: 'rgba(255, 255, 255, 0.7)',
+                        darkGlass: 'rgba(30, 41, 59, 0.7)'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body
+    class="bg-gray-50 text-gray-800 transition-colors duration-300 dark:bg-slate-900 dark:text-gray-100 min-h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass-panel border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen fixed z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                <i class="fas fa-shopping-basket text-xl"></i>
+            </div>
+            <h1
+                class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                GroceryOS</h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li>
+                    <a href="dashboard.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium">
+                        <i class="fas fa-chart-pie w-5"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="products.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium">
+                        <i class="fas fa-box w-5"></i> Products
+                    </a>
+                </li>
+                <li>
+                    <a href="orders.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium">
+                        <i class="fas fa-shopping-cart w-5"></i> Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="customers.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium">
+                        <i class="fas fa-users w-5"></i> Customers
+                    </a>
+                </li>
+                <li>
+                    <a href="invoices.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium">
+                        <i class="fas fa-file-invoice-dollar w-5"></i> Invoices
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="p-6 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-3">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=4F46E5&color=fff" alt="Admin"
+                    class="w-10 h-10 rounded-full shadow-md">
+                <div>
+                    <p class="font-medium text-sm">Store Admin</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Online</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 h-screen overflow-y-auto">
+        <!-- Top Header -->
+        <header
+            class="h-16 glass-panel sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8">
+            <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" placeholder="Global search..."
+                    class="pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-indigo-500 outline-none w-64 transition-all focus:w-80 text-sm">
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="relative p-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                    <i class="fas fa-bell"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 transition-colors">
+                    <!-- Icon populated via JS -->
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="p-8">
+            <div class="mb-8 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-bold mb-1">Overview</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Welcome back, here's what's happening today.</p>
+                </div>
+                <button
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-lg hover:shadow-indigo-500/30 transition-all font-medium flex items-center gap-2 text-sm">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Revenue Card -->
+                <div class="glass-panel rounded-2xl p-6 hover-scale relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full blur-xl"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</p>
+                            <h3 class="text-3xl font-bold mt-1" id="totalRevenue">$0.00</h3>
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 flex items-center justify-center">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Card -->
+                <div class="glass-panel rounded-2xl p-6 hover-scale relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</p>
+                            <h3 class="text-3xl font-bold mt-1" id="totalOrders">0</h3>
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 flex items-center justify-center">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Card -->
+                <div class="glass-panel rounded-2xl p-6 hover-scale relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Customers</p>
+                            <h3 class="text-3xl font-bold mt-1" id="totalCustomers">0</h3>
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alerts Card -->
+                <div class="glass-panel rounded-2xl p-6 hover-scale relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-orange-500/10 rounded-full blur-xl"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Low Stock Alerts</p>
+                            <h3 class="text-3xl font-bold mt-1 text-orange-600 dark:text-orange-400"
+                                id="lowStockAlerts">0</h3>
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Main Chart -->
+                <div class="glass-panel rounded-2xl p-6 lg:col-span-2">
+                    <h3 class="text-lg font-bold mb-4">Weekly Revenue</h3>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Secondary Chart -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-lg font-bold mb-4">Top Selling Categories</h3>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Dashboard specific logic
+        let revenueChartInstance = null;
+        let categoryChartInstance = null;
+
+        async function loadDashboardData() {
+            try {
+                const data = await fetchAPI('/dashboard');
+                document.getElementById('totalRevenue').innerText = '$' + data.total_revenue.toFixed(2);
+                document.getElementById('totalOrders').innerText = data.total_orders;
+                document.getElementById('totalCustomers').innerText = data.total_customers;
+
+                const alertsEl = document.getElementById('lowStockAlerts');
+                alertsEl.innerText = data.low_stock_alerts;
+                if (data.low_stock_alerts > 0) {
+                    alertsEl.classList.add('animate-pulse');
+                }
+
+                initCharts();
+            } catch (e) {
+                console.error("Failed to load dashboard data", e);
+            }
+        }
+
+        function getChartColors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return {
+                text: isDark ? '#94a3b8' : '#64748b',
+                grid: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
+            };
+        }
+
+        function initCharts() {
+            const colors = getChartColors();
+
+            // Dummy data for weekly revenue
+            const ctx1 = document.getElementById('revenueChart').getContext('2d');
+
+            // Gradient fill
+            const gradient = ctx1.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.5)');
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+
+            if (revenueChartInstance) revenueChartInstance.destroy();
+
+            revenueChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: [1200, 1900, 1500, 2200, 1800, 2800, 2400],
+                        borderColor: '#4F46E5',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4F46E5',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: colors.grid },
+                            ticks: { color: colors.text }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: colors.text }
+                        }
+                    }
+                }
+            });
+
+            // Dummy data for categories
+            const ctx2 = document.getElementById('categoryChart').getContext('2d');
+
+            if (categoryChartInstance) categoryChartInstance.destroy();
+
+            categoryChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Produce', 'Dairy', 'Meat', 'Bakery', 'Pantry'],
+                    datasets: [{
+                        data: [35, 20, 15, 10, 20],
+                        backgroundColor: ['#4F46E5', '#3B82F6', '#10B981', '#F59E0B', '#6366F1'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: colors.text,
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Re-init charts on theme change to update font colors
+        window.addEventListener('themeChanged', initCharts);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+        });
+    </script>
+</body>
+
+</html>

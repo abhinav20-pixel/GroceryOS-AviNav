@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroceryOS | Orders - AviNav</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        glass: 'rgba(255, 255, 255, 0.7)',
+                        darkGlass: 'rgba(30, 41, 59, 0.7)'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body
+    class="bg-gray-50 text-gray-800 transition-colors duration-300 dark:bg-slate-900 dark:text-gray-100 min-h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass-panel border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen fixed z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                <i class="fas fa-shopping-basket text-xl"></i>
+            </div>
+            <h1
+                class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                GroceryOS</h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li><a href="dashboard.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-chart-pie w-5"></i> Dashboard</a></li>
+                <li><a href="products.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-box w-5"></i> Products</a></li>
+                <li><a href="orders.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-shopping-cart w-5"></i> Orders</a></li>
+                <li><a href="customers.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-users w-5"></i> Customers</a></li>
+                <li><a href="invoices.html"
+                        class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium"><i
+                            class="fas fa-file-invoice-dollar w-5"></i> Invoices</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 h-screen overflow-y-auto">
+        <!-- Header -->
+        <header
+            class="h-16 glass-panel sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8">
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="productSearch" placeholder="Scan barcode or type product name..."
+                    class="pl-10 pr-4 py-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium">
+
+                <!-- Search Results Dropdown -->
+                <div id="searchResults"
+                    class="absolute mt-2 w-full glass-panel rounded-xl shadow-xl hidden flex-col max-h-64 overflow-y-auto z-50">
+                    <!-- Results dynamically inserted here -->
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div
+                    class="text-sm font-medium px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+                    Point of Sale Terminal
+                </div>
+                <button id="theme-toggle"
+                    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 transition-colors"></button>
+            </div>
+        </header>
+
+        <!-- POS Content -->
+        <div class="p-8 h-[calc(100vh-4rem)] flex gap-6">
+
+            <!-- Left Side: Active Cart -->
+            <div class="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden">
+                <div
+                    class="p-4 border-b border-gray-100 dark:border-gray-700 font-bold text-lg flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+                    <span><i class="fas fa-shopping-basket text-indigo-500 mr-2"></i> Current Order</span>
+                    <span id="cartCount" class="bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">0 Items</span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4" id="cartContainer">
+                    <!-- Cart items inserted here -->
+                    <div id="emptyCartMessage" class="h-full flex flex-col items-center justify-center text-gray-400">
+                        <i class="fas fa-cart-arrow-down text-6xl mb-4 opacity-50"></i>
+                        <p>Cart is empty. Search for products to add them.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Order Summary -->
+            <div class="w-80 glass-panel rounded-2xl flex flex-col overflow-hidden">
+                <div
+                    class="p-4 border-b border-gray-100 dark:border-gray-700 font-bold flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+                    <span>Order Summary</span>
+                    <button onclick="clearCart()" class="text-gray-400 hover:text-red-500 transition-colors text-sm"><i
+                            class="fas fa-trash mr-1"></i> Clear</button>
+                </div>
+
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Customer
+                            (Optional)</label>
+                        <select id="customerSelect"
+                            class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-indigo-500 outline-none text-sm cursor-pointer appearance-none">
+                            <option value="">Walk-in Customer</option>
+                            <!-- Customers populated here -->
+                        </select>
+                    </div>
+
+                    <div class="space-y-3 mt-4 text-sm font-medium">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
+                            <span id="subtotalAmount">$0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500 dark:text-gray-400">Tax Pattern (8%)</span>
+                            <span id="taxAmount">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-500 dark:text-gray-400">Discount</span>
+                            <div class="flex items-center">
+                                <span class="mr-1">$</span>
+                                <input type="number" id="discountInput" value="0" min="0" step="0.01"
+                                    class="w-16 bg-gray-50 dark:bg-gray-800 border-none rounded p-1 text-right focus:ring-indigo-500 focus:ring-2 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <div class="flex justify-between items-end mb-6">
+                            <span class="text-lg font-bold">Total Amount</span>
+                            <span id="grandTotal"
+                                class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">$0.00</span>
+                        </div>
+                        <button onclick="placeOrder()" id="checkoutBtn" disabled
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-indigo-500/30 transition-all flex justify-center items-center gap-2">
+                            <i class="fas fa-credit-card"></i> Process Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        let cart = [];
+        let customers = [];
+        let taxRate = 0.08;
+
+        // --- Search Logic ---
+        let searchTimeout;
+        const searchInput = document.getElementById('productSearch');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value;
+
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const products = await fetchAPI(`/products?search=${encodeURIComponent(query)}`);
+                    renderSearchResults(products);
+                } catch (error) { }
+            }, 300);
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        function renderSearchResults(products) {
+            searchResults.innerHTML = '';
+
+            if (products.length === 0) {
+                searchResults.innerHTML = `<div class="p-4 text-center text-gray-500">No products found</div>`;
+            } else {
+                products.forEach(p => {
+                    const el = document.createElement('div');
+                    el.className = "flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-700/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer transition-colors";
+
+                    const isOutOfStock = p.quantity <= 0;
+
+                    el.innerHTML = `
+                        <div>
+                            <p class="font-bold text-sm ${isOutOfStock ? 'text-gray-400 line-through' : ''}">${p.name}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Stock: ${p.quantity} | Cat: ${p.category}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-indigo-600 dark:text-indigo-400">$${p.price.toFixed(2)}</span>
+                            ${!isOutOfStock ?
+                            `<button onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, ${p.quantity})" class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors flex items-center justify-center"><i class="fas fa-plus"></i></button>`
+                            : '<span class="text-xs font-bold text-red-500 bg-red-100 px-2 py-1 rounded">Out of Stock</span>'
+                        }
+                        </div>
+                    `;
+                    searchResults.appendChild(el);
+                });
+            }
+            searchResults.classList.remove('hidden');
+        }
+
+        // --- Cart Logic ---
+        function addToCart(id, name, price, maxQty) {
+            event.stopPropagation();
+
+            const existingItem = cart.find(item => item.id === id);
+            if (existingItem) {
+                if (existingItem.quantity < maxQty) {
+                    existingItem.quantity++;
+                    updateCartUI();
+                } else {
+                    showNotification(`Maximum stock (${maxQty}) reached for ${name}`, 'error');
+                }
+            } else {
+                if (maxQty > 0) {
+                    cart.push({ id, name, price, quantity: 1, maxQty });
+                    updateCartUI();
+
+                    // Add subtle jump animation to cart counter
+                    const counter = document.getElementById('cartCount');
+                    counter.classList.add('animate-bounce');
+                    setTimeout(() => counter.classList.remove('animate-bounce'), 1000);
+                }
+            }
+
+            searchInput.focus();
+            searchResults.classList.add('hidden');
+            searchInput.value = '';
+        }
+
+        function updateCartItemQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+
+            const newQty = parseInt(item.quantity) + parseInt(delta);
+
+            if (newQty <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            } else if (newQty > parseInt(item.maxQty)) {
+                showNotification(`Maximum stock (${item.maxQty}) reached for ${item.name}`, 'error');
+                return;
+            } else {
+                item.quantity = newQty;
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+        }
+
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (confirm("Are you sure you want to clear the cart?")) {
+                cart = [];
+                document.getElementById('discountInput').value = '0';
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartContainer');
+
+            container.innerHTML = '';
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div id="emptyCartMessage" class="h-full flex flex-col items-center justify-center text-gray-400">
+                        <i class="fas fa-cart-arrow-down text-6xl mb-4 opacity-50"></i>
+                        <p>Cart is empty. Search for products to add them.</p>
+                    </div>
+                `;
+                document.getElementById('cartCount').innerText = '0 Items';
+            } else {
+                let totalItems = 0;
+
+                cart.forEach((item, index) => {
+                    totalItems += item.quantity;
+                    const el = document.createElement('div');
+                    el.className = "flex items-center justify-between p-4 mb-3 rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow animate-fade-in";
+                    el.style.animationDelay = `${index * 0.05}s`;
+
+                    el.innerHTML = `
+                        <div class="flex-1">
+                            <h4 class="font-bold mb-1">${item.name}</h4>
+                            <p class="text-sm text-gray-500">$${item.price.toFixed(2)} / each</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                <button onclick="updateCartItemQty(${item.id}, -1)" class="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white dark:hover:bg-gray-600 transition-colors shadow-sm"><i class="fas fa-minus text-xs"></i></button>
+                                <span class="w-10 text-center font-bold">${item.quantity}</span>
+                                <button onclick="updateCartItemQty(${item.id}, 1)" class="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white dark:hover:bg-gray-600 transition-colors shadow-sm"><i class="fas fa-plus text-xs"></i></button>
+                            </div>
+                            <div class="w-20 text-right">
+                                <p class="font-bold text-lg">$${(item.price * item.quantity).toFixed(2)}</p>
+                            </div>
+                            <button onclick="removeFromCart(${item.id})" class="text-gray-400 hover:text-red-500 transition-colors p-2"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    container.appendChild(el);
+                });
+
+                document.getElementById('cartCount').innerText = `${totalItems} Items`;
+            }
+
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * taxRate;
+
+            const discountInput = document.getElementById('discountInput').value;
+            const discount = parseFloat(discountInput) || 0;
+
+            const total = subtotal + tax - discount;
+
+            document.getElementById('subtotalAmount').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('taxAmount').innerText = `$${tax.toFixed(2)}`;
+            document.getElementById('grandTotal').innerText = `$${Math.max(0, total).toFixed(2)}`;
+
+            document.getElementById('checkoutBtn').disabled = cart.length === 0;
+        }
+
+        document.getElementById('discountInput').addEventListener('input', calculateTotals);
+
+        // --- Customers Logic ---
+        async function loadCustomers() {
+            try {
+                customers = await fetchAPI('/customers');
+                const select = document.getElementById('customerSelect');
+                customers.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.id;
+                    option.text = c.name + (c.phone ? ` (${c.phone})` : '');
+                    select.appendChild(option);
+                });
+            } catch (error) { }
+        }
+
+        // --- Order Placement ---
+        async function placeOrder() {
+            if (cart.length === 0) return;
+
+            const btn = document.getElementById('checkoutBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const payload = {
+                customer_id: document.getElementById('customerSelect').value || null,
+                items: cart.map(i => ({ product_id: i.id, quantity: i.quantity, price: i.price })),
+                tax: subtotal * taxRate,
+                discount: parseFloat(document.getElementById('discountInput').value) || 0
+            };
+
+            try {
+                const response = await fetchAPI('/orders', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                showNotification(response.message || 'Order Placed Successfully!');
+
+                // Print Bill Option (simulated)
+                if (confirm("Order successful! Would you like to print the bill?")) {
+                    console.log("Printing invoice ", response.id);
+                    // Can redirect to invoice view later
+                }
+
+                cart = [];
+                document.getElementById('discountInput').value = '0';
+                document.getElementById('customerSelect').value = '';
+                updateCartUI();
+            } catch (error) {
+                // error handled in fetchAPI
+            } finally {
+                btn.innerHTML = '<i class="fas fa-credit-card"></i> Process Payment';
+                btn.disabled = cart.length === 0;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCustomers();
+            updateCartUI(); // Initial clear state
+        });
+
+        // Add minimal animation classes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; opacity: 0; }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>
